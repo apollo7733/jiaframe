@@ -95,10 +95,10 @@ module.exports = function(
 
   // Setup the script rules
   appPackage.scripts = {
-    start: 'react-scripts start',
-    build: 'react-scripts build',
-    test: 'react-scripts test',
-    eject: 'react-scripts eject',
+    start: 'jiaframe start',
+    build: 'jiaframe build',
+    test: 'jiaframe test',
+    eject: 'jiaframe eject',
   };
 
   // Setup the eslint config
@@ -159,7 +159,7 @@ module.exports = function(
 
   if (useYarn) {
     command = 'yarnpkg';
-    args = ['add'];
+    args = ['add','@babel/polyfill'];
   } else {
     command = 'npm';
     args = ['install', '--save', verbose && '--verbose'].filter(e => e);
@@ -182,7 +182,7 @@ module.exports = function(
   }
 
   // Install react and react-dom for backward compatibility with old CRA cli
-  // which doesn't install react and react-dom along with react-scripts
+  // which doesn't install react and react-dom along with jiaframe
   // or template is presetend (via --internal-testing-template)
   if (!isReactInstalled(appPackage) || template) {
     console.log(`Installing react and react-dom using ${command}...`);
@@ -193,6 +193,14 @@ module.exports = function(
       console.error(`\`${command} ${args.join(' ')}\` failed`);
       return;
     }
+  }
+
+  const extArgs = ['antd'];
+
+  const antProc = spawn.sync(command, args.concat(extArgs), { stdio: 'inherit' });
+  if (antProc.status !== 0) {
+    console.error(`\`${command} ${args.concat(extArgs).join(' ')}\` failed`);
+    return;
   }
 
   if (useTypeScript) {

@@ -15,8 +15,11 @@ process.on('unhandledRejection', err => {
   throw err;
 });
 
+const fs = require('fs');
+const { appPath } = require('../config/paths');
 const spawn = require('react-dev-utils/crossSpawn');
 const args = process.argv.slice(2);
+const myName = require('../package.json').name;
 
 const scriptIndex = args.findIndex(
   x => x === 'build' || x === 'eject' || x === 'start' || x === 'test'
@@ -29,13 +32,25 @@ switch (script) {
   case 'eject':
   case 'start':
   case 'test': {
-    const result = spawn.sync(
-      'node',
-      nodeArgs
-        .concat(require.resolve('../scripts/' + script))
-        .concat(args.slice(scriptIndex + 1)),
-      { stdio: 'inherit' }
-    );
+    let result;
+    if (script !== 'eject' && fs.existsSync(appPath + '/config-overrides.js')) {
+      result = spawn.sync(
+        'node',
+        nodeArgs
+          .concat(require.resolve('react-app-rewired/scripts/' + script))
+          .concat(['--scripts-version', myName])
+          .concat(args.slice(scriptIndex + 1)),
+        { stdio: 'inherit' }
+      );
+    } else {
+      result = spawn.sync(
+        'node',
+        nodeArgs
+          .concat(require.resolve('../scripts/' + script))
+          .concat(args.slice(scriptIndex + 1)),
+        { stdio: 'inherit' }
+      );
+    }
     if (result.signal) {
       if (result.signal === 'SIGKILL') {
         console.log(

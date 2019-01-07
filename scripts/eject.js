@@ -158,7 +158,7 @@ inquirer
     console.log(cyan('Updating the dependencies'));
     const ownPackageName = ownPackage.name;
     if (appPackage.devDependencies) {
-      // We used to put react-scripts in devDependencies
+      // We used to put jiaframe in devDependencies
       if (appPackage.devDependencies[ownPackageName]) {
         console.log(`  Removing ${cyan(ownPackageName)} from devDependencies`);
         delete appPackage.devDependencies[ownPackageName];
